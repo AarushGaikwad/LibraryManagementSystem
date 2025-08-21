@@ -3,10 +3,11 @@ package com.example.LibraryManagementSystem.dto;
 import lombok.Data;
 
 @Data
-public class CreateUserDto { //used for the inputs from the user
+public class TeacherDto {
 
+    private Long userId;
     private String name;
     private String email;
-    private String password;
-    private String role;
+    private String department;
+    private String designation;
 }
