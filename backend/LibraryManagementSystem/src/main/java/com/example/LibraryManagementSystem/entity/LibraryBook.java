@@ -29,4 +29,7 @@ public class LibraryBook {
 
     @Column(nullable = false)
     private Boolean available = true;
+
+    @Column(nullable=true)
+    private String category;
 }

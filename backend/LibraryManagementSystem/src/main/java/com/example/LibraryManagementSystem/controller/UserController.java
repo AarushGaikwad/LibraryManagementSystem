@@ -16,6 +16,7 @@ public class UserController {
 
     private final UserService userService;
 
+    //this method is used to add the library user by accepting the json body
     @PostMapping
     public ResponseEntity<LibraryUser> createUser(@RequestBody LibraryUser user){
         LibraryUser savedUser = userService.saveUser(user);

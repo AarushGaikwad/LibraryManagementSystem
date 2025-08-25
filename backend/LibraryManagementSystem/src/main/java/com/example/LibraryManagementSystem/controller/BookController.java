@@ -38,4 +38,19 @@ public class BookController {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public List<LibraryBook> searchBooks(@RequestParam String query) {
+        return bookService.searchBooks(query);
+    }
+
+    @GetMapping("/available")
+    public List<LibraryBook> getAvailableBooks() {
+        return bookService.getAvailableBooks();
+    }
+
+    @GetMapping("/category/{category}")
+    public List<LibraryBook> getBooksByCategory(@PathVariable String category) {
+        return bookService.getBooksByCategory(category);
+    }
 }
