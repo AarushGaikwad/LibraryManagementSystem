@@ -9,5 +9,8 @@ public interface UserService {
     LibraryUser saveUser(LibraryUser user);
     Optional<LibraryUser> findById(Long id);
     List<LibraryUser> findAll();
+    Optional<LibraryUser> findByEmail(String email);
     void deleteUser(Long id);
+    LibraryUser updateUser(Long id, LibraryUser updatedUser);
+
 }

@@ -3,7 +3,7 @@ package com.example.LibraryManagementSystem.dto;
 import lombok.Data;
 
 @Data
-public class userDto {
+public class UserDto {
 
     private Long id;
     private String name;

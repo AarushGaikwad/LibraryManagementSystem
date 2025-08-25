@@ -31,13 +31,20 @@ public class UserController {
     }
 
     @GetMapping
-    public List<LibraryUser> getAllUsers(){
-        return userService.findAll();
+    public ResponseEntity<List<LibraryUser>> getAllUsers() {
+        List<LibraryUser> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LibraryUser> updateUser(@PathVariable Long id, @RequestBody LibraryUser updatedUser) {
+        LibraryUser user = userService.updateUser(id, updatedUser);
+        return ResponseEntity.ok(user);
     }
 }
