@@ -1,5 +1,6 @@
 package com.example.LibraryManagementSystem.service;
 
+import com.example.LibraryManagementSystem.dto.CreateBookDto;
 import com.example.LibraryManagementSystem.dto.UpdateBookDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 public interface BookService {
 
-    LibraryBook saveBook(LibraryBook book);
+    LibraryBook saveBook(CreateBookDto dto);
 
     Optional<LibraryBook> findById(Long id);
 

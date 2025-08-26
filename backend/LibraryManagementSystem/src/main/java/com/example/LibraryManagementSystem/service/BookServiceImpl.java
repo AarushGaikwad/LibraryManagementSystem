@@ -1,5 +1,6 @@
 package com.example.LibraryManagementSystem.service;
 
+import com.example.LibraryManagementSystem.dto.CreateBookDto;
 import com.example.LibraryManagementSystem.dto.UpdateBookDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.repository.BookRepository;
@@ -17,7 +18,12 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
-    public LibraryBook saveBook(LibraryBook book) {
+    public LibraryBook saveBook(CreateBookDto dto) {
+        LibraryBook book = LibraryBook.builder()
+                .title(dto.getTitle())
+                .author(dto.getAuthor())
+                .available(true)  // Default value
+                .build();
         return bookRepository.save(book);
     }
 

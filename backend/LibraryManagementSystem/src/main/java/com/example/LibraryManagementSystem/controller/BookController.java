@@ -1,5 +1,8 @@
 package com.example.LibraryManagementSystem.controller;
 
+import com.example.LibraryManagementSystem.dto.BookDto;
+import com.example.LibraryManagementSystem.dto.CreateBookDto;
+import com.example.LibraryManagementSystem.dto.UpdateBookDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -16,21 +19,34 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<LibraryBook> createBook(@RequestBody LibraryBook book) {
-        LibraryBook savedBook = bookService.saveBook(book);
-        return ResponseEntity.ok(savedBook);
+    public ResponseEntity<BookDto> createBook(@RequestBody CreateBookDto dto) {
+        LibraryBook savedBook = bookService.saveBook(dto);
+        BookDto responseDto = convertToDto(savedBook);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LibraryBook> getBookById(@PathVariable Long id) {
+    public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         return bookService.findById(id)
+                .map(this::convertToDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<LibraryBook> getAllBooks() {
-        return bookService.findAll();
+    public ResponseEntity<List<BookDto>> getAllBooks() {
+        List<BookDto> books = bookService.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+        return ResponseEntity.ok(books);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDto> updateBook(@PathVariable Long id,
+                                              @RequestBody UpdateBookDto dto) {
+        LibraryBook updated = bookService.updateBook(id, dto);
+        return ResponseEntity.ok(convertToDto(updated));
     }
 
     @DeleteMapping("/{id}")
@@ -40,17 +56,40 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public List<LibraryBook> searchBooks(@RequestParam String query) {
-        return bookService.searchBooks(query);
+    public ResponseEntity<List<BookDto>> searchBooks(@RequestParam String query) {
+        List<BookDto> books = bookService.searchBooks(query)
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/available")
-    public List<LibraryBook> getAvailableBooks() {
-        return bookService.getAvailableBooks();
+    public ResponseEntity<List<BookDto>> getAvailableBooks() {
+        List<BookDto> books = bookService.getAvailableBooks()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/category/{category}")
-    public List<LibraryBook> getBooksByCategory(@PathVariable String category) {
-        return bookService.getBooksByCategory(category);
+    public ResponseEntity<List<BookDto>> getBooksByCategory(@PathVariable String category) {
+        List<BookDto> books = bookService.getBooksByCategory(category)
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+        return ResponseEntity.ok(books);
+    }
+
+    // Helper method to convert Entity to DTO
+    private BookDto convertToDto(LibraryBook book) {
+        BookDto dto = new BookDto();
+        dto.setId(book.getId());
+        dto.setTitle(book.getTitle());
+        dto.setAuthor(book.getAuthor());
+        dto.setQrCode(book.getQrCode());
+        dto.setAvailable(book.getAvailable());
+        return dto;
     }
 }
