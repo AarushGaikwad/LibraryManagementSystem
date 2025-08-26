@@ -1,5 +1,8 @@
 package com.example.LibraryManagementSystem.controller;
 
+import com.example.LibraryManagementSystem.dto.CreateUserDto;
+import com.example.LibraryManagementSystem.dto.UpdateUserDto;
+import com.example.LibraryManagementSystem.dto.UserDto;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,35 +19,51 @@ public class UserController {
 
     private final UserService userService;
 
-    //this method is used to add the library user by accepting the json body
     @PostMapping
-    public ResponseEntity<LibraryUser> createUser(@RequestBody LibraryUser user){
-        LibraryUser savedUser = userService.saveUser(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto dto) {
+        LibraryUser savedUser = userService.saveUser(dto);
+        UserDto responseDto = convertToDto(savedUser);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LibraryUser> getUserById(@PathVariable Long id){
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return userService.findById(id)
+                .map(this::convertToDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<List<LibraryUser>> getAllUsers() {
-        List<LibraryUser> users = userService.findAll();
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
         return ResponseEntity.ok(users);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
+                                              @RequestBody UpdateUserDto dto) {
+        LibraryUser updated = userService.updateUser(id, dto);
+        return ResponseEntity.ok(convertToDto(updated));
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<LibraryUser> updateUser(@PathVariable Long id, @RequestBody LibraryUser updatedUser) {
-        LibraryUser user = userService.updateUser(id, updatedUser);
-        return ResponseEntity.ok(user);
+    // Helper method to convert Entity to DTO
+    private UserDto convertToDto(LibraryUser user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole());
+        // Note: Password is excluded for security
+        return dto;
     }
 }
