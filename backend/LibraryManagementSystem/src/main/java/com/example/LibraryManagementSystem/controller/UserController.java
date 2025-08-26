@@ -5,6 +5,7 @@ import com.example.LibraryManagementSystem.dto.UpdateUserDto;
 import com.example.LibraryManagementSystem.dto.UserDto;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto dto) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto dto) {
         LibraryUser savedUser = userService.saveUser(dto);
         UserDto responseDto = convertToDto(savedUser);
         return ResponseEntity.ok(responseDto);
@@ -45,7 +46,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
-                                              @RequestBody UpdateUserDto dto) {
+                                              @Valid @RequestBody UpdateUserDto dto) {
         LibraryUser updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(convertToDto(updated));
     }
@@ -56,7 +57,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // Helper method to convert Entity to DTO
     private UserDto convertToDto(LibraryUser user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());

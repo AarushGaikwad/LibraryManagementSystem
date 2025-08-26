@@ -19,11 +19,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public LibraryBook saveBook(CreateBookDto dto) {
+        // Convert DTO to Entity
         LibraryBook book = LibraryBook.builder()
                 .title(dto.getTitle())
                 .author(dto.getAuthor())
+                .category(dto.getCategory())
                 .available(true)  // Default value
                 .build();
+
         return bookRepository.save(book);
     }
 
@@ -64,7 +67,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<LibraryBook> searchBooks(String query) {
-        // Simple example: search by title or author containing query (case insensitive)
         return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query, query);
     }
 

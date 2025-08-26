@@ -1,10 +1,16 @@
 package com.example.LibraryManagementSystem.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class CreateBookDto {  //use for the inputs from the user
+public class CreateBookDto {
 
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @NotBlank(message = "Author is required")
     private String author;
+
+    private String category;
 }

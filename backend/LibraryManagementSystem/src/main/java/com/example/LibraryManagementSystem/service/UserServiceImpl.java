@@ -21,12 +21,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LibraryUser saveUser(CreateUserDto dto) {
+        // Convert DTO to Entity
         LibraryUser user = LibraryUser.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .password(dto.getPassword()) // In real app, hash the password
                 .role(dto.getRole())
                 .build();
+
         return userRepository.save(user);
     }
 

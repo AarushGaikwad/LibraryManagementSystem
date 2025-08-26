@@ -10,4 +10,5 @@ public class BookDto {
     private String author;
     private String qrCode;
     private Boolean available;
+    private String category;
 }

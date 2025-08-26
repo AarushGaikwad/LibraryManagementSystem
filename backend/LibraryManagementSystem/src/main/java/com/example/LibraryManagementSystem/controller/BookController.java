@@ -5,6 +5,7 @@ import com.example.LibraryManagementSystem.dto.CreateBookDto;
 import com.example.LibraryManagementSystem.dto.UpdateBookDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.service.BookService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<BookDto> createBook(@RequestBody CreateBookDto dto) {
+    public ResponseEntity<BookDto> createBook(@Valid @RequestBody CreateBookDto dto) {
         LibraryBook savedBook = bookService.saveBook(dto);
         BookDto responseDto = convertToDto(savedBook);
         return ResponseEntity.ok(responseDto);
@@ -44,7 +45,7 @@ public class BookController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BookDto> updateBook(@PathVariable Long id,
-                                              @RequestBody UpdateBookDto dto) {
+                                              @Valid @RequestBody UpdateBookDto dto) {
         LibraryBook updated = bookService.updateBook(id, dto);
         return ResponseEntity.ok(convertToDto(updated));
     }
@@ -82,7 +83,6 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    // Helper method to convert Entity to DTO
     private BookDto convertToDto(LibraryBook book) {
         BookDto dto = new BookDto();
         dto.setId(book.getId());
@@ -90,6 +90,7 @@ public class BookController {
         dto.setAuthor(book.getAuthor());
         dto.setQrCode(book.getQrCode());
         dto.setAvailable(book.getAvailable());
+        dto.setCategory(book.getCategory());
         return dto;
     }
 }
