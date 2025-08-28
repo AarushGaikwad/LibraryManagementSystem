@@ -7,7 +7,6 @@ import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
