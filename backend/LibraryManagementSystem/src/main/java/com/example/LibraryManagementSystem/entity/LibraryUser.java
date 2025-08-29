@@ -29,4 +29,7 @@ public class LibraryUser {
 
     @Column(nullable = false)
     private String role;
+
+    @Column(nullable = false)
+    private boolean firstLogin = true;
 }
