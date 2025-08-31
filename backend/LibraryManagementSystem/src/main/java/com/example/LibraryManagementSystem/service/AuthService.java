@@ -1,49 +1,23 @@
 package com.example.LibraryManagementSystem.service;
 
-import com.example.LibraryManagementSystem.entity.LibraryUser;
-import com.example.LibraryManagementSystem.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.example.LibraryManagementSystem.dto.ChangePasswordRequest;
+import com.example.LibraryManagementSystem.dto.LoginRequest;
+import com.example.LibraryManagementSystem.dto.LoginResponse;
+import com.example.LibraryManagementSystem.dto.RefreshTokenRequest;
 
-@Service
-@RequiredArgsConstructor
-public class AuthService {
+public interface AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    // Role-specific login methods
+    LoginResponse loginStudent(LoginRequest request);
+    LoginResponse loginTeacher(LoginRequest request);
+    LoginResponse loginAdmin(LoginRequest request);
 
-    // Login method
-    public LibraryUser login(String email, String password) {
-        LibraryUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // Token operations
+    LoginResponse refreshToken(RefreshTokenRequest request);
 
-        // Check password
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
-        }
+    // Password management
+    void changePassword(Long userId, ChangePasswordRequest request);
 
-        // Check if first login
-        if (user.isFirstLogin()) {
-            throw new RuntimeException("Password change required on first login");
-        }
-
-        return user;
-    }
-
-    // Change password method
-    public void changePassword(String email, String newPassword) {
-        LibraryUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Encode new password
-        user.setPassword(passwordEncoder.encode(newPassword));
-
-        // Mark firstLogin as false after first password change
-        if (user.isFirstLogin()) {
-            user.setFirstLogin(false);
-        }
-
-        userRepository.save(user);
-    }
+    // Utility methods
+    void validateUserRole(String email, String expectedRole);
 }
