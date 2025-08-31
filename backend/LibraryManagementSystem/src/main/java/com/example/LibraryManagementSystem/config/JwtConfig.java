@@ -11,7 +11,7 @@ public class JwtConfig {
     @Value("${JWT_SECRET}")
     private String secret;
 
-    @Value("${JWT_EXPIRATION:86400000}") //24 hours
+    @Value("${JWT_EXPIRATION:7200000}") //2 hours
     private Long expiration;
 
     @Value("${JWT_REFRESH_EXPIRATION:604800000}") //7 days
