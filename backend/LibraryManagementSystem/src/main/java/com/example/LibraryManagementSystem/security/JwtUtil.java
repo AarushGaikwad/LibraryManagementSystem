@@ -132,7 +132,7 @@ public class JwtUtil {
         }
     }
 
-    // Validate refresh token
+    // Validate refresh token structure (basic JWT validation)
     public Boolean validateRefreshToken(String token) {
         try {
             String tokenType = extractTokenType(token);

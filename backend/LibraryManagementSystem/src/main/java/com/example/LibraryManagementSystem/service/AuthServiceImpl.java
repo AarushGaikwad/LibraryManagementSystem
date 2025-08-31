@@ -7,6 +7,7 @@ import com.example.LibraryManagementSystem.dto.RefreshTokenRequest;
 import com.example.LibraryManagementSystem.entity.LibraryStudent;
 import com.example.LibraryManagementSystem.entity.LibraryTeacher;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
+import com.example.LibraryManagementSystem.entity.RefreshToken;
 import com.example.LibraryManagementSystem.exception.AuthenticationException;
 import com.example.LibraryManagementSystem.exception.FirstLoginException;
 import com.example.LibraryManagementSystem.repository.StudentRepository;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService{
     private final TeacherRepository teacherRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,8 +91,12 @@ public class AuthServiceImpl implements AuthService{
 
         String refreshToken = request.getRefreshToken();
 
+        // Validate refresh token using the service (checks database and expiration)
+        RefreshToken storedToken = refreshTokenService.validateRefreshToken(refreshToken);
+
+        // Also validate JWT structure
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
-            throw new AuthenticationException("Invalid or expired refresh token");
+            throw new AuthenticationException("Invalid refresh token structure");
         }
 
         // Extract user information from refresh token
@@ -105,6 +111,13 @@ public class AuthServiceImpl implements AuthService{
         // Generate new tokens
         String newAccessToken = jwtUtil.generateToken(userId, user.getName(), email, role);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId, user.getName(), email, role);
+
+        // Store new refresh token in database
+        refreshTokenService.createRefreshToken(userId, newRefreshToken, 
+            storedToken.getDeviceId(), storedToken.getIpAddress(), storedToken.getUserAgent());
+
+        // Revoke old refresh token
+        refreshTokenService.revokeRefreshToken(refreshToken);
 
         // Build response based on role
         LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
@@ -186,6 +199,21 @@ public class AuthServiceImpl implements AuthService{
         }
     }
 
+    @Override
+    @Transactional
+    public void revokeAllUserTokens(Long userId) {
+        log.info("Revoking all refresh tokens for user ID: {}", userId);
+        refreshTokenService.revokeAllUserTokens(userId);
+        log.info("All refresh tokens revoked for user ID: {}", userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getDeviceInfo(String refreshToken) {
+        log.info("Getting device info for refresh token");
+        return refreshTokenService.getDeviceInfo(refreshToken);
+    }
+
     // Private helper methods
 
     private LibraryUser authenticateUser(LoginRequest request, String expectedRole) {
@@ -211,6 +239,9 @@ public class AuthServiceImpl implements AuthService{
         // Generate tokens
         String accessToken = jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
+
+        // Store refresh token in database (device tracking will be handled by the service)
+        refreshTokenService.createRefreshToken(user.getId(), refreshToken, null, null, null);
 
         // Build user info
         LoginResponse.UserInfo.UserInfoBuilder userInfoBuilder = LoginResponse.UserInfo.builder()

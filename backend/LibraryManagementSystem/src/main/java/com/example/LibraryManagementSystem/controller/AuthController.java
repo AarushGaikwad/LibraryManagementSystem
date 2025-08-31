@@ -96,9 +96,21 @@ public class AuthController {
 
     // Refresh Token Endpoint
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request, HttpServletRequest httpRequest) {
         try {
             log.info("Token refresh request received");
+            
+            // Extract device information from request if not provided
+            if (request.getDeviceId() == null || request.getDeviceId().trim().isEmpty()) {
+                request.setDeviceId(generateDeviceId(httpRequest));
+            }
+            if (request.getIpAddress() == null || request.getIpAddress().trim().isEmpty()) {
+                request.setIpAddress(extractClientIpAddress(httpRequest));
+            }
+            if (request.getUserAgent() == null || request.getUserAgent().trim().isEmpty()) {
+                request.setUserAgent(httpRequest.getHeader("User-Agent"));
+            }
+            
             LoginResponse response = authService.refreshToken(request);
             log.info("Token refresh successful");
             return ResponseEntity.ok(response);
@@ -141,14 +153,15 @@ public class AuthController {
         }
     }
 
-    // Logout Endpoint (for client-side token cleanup)
+    // Logout Endpoint (revokes refresh tokens)
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         try {
-            // Since we're using stateless JWT, logout is handled client-side
-            // This endpoint is provided for consistency and potential future enhancements
             Long userId = extractUserIdFromToken(request);
             log.info("Logout request received for user ID: {}", userId);
+
+            // Revoke all refresh tokens for the user
+            authService.revokeAllUserTokens(userId);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Logged out successfully");
@@ -193,6 +206,43 @@ public class AuthController {
         }
     }
 
+    // Get Device Information Endpoint
+    @GetMapping("/device-info")
+    public ResponseEntity<?> getDeviceInfo(HttpServletRequest request) {
+        try {
+            String token = extractTokenFromRequest(request);
+
+            if (token == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(createErrorResponse("NO_TOKEN", "No authentication token provided"));
+            }
+
+            // Extract refresh token from request body or query parameter
+            String refreshToken = request.getParameter("refreshToken");
+            if (refreshToken == null || refreshToken.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("MISSING_REFRESH_TOKEN", "Refresh token is required"));
+            }
+
+            // Get device information from refresh token service
+            String deviceInfo = authService.getDeviceInfo(refreshToken);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("deviceInfo", deviceInfo);
+            response.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationException e) {
+            log.error("Failed to get device info: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(createErrorResponse("DEVICE_INFO_ERROR", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error retrieving device info", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("INTERNAL_ERROR", "Failed to retrieve device information"));
+        }
+    }
+
     // Private helper methods
 
     private ResponseEntity<?> handleFirstLoginException(FirstLoginException e) {
@@ -229,5 +279,27 @@ public class AuthController {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private String generateDeviceId(HttpServletRequest request) {
+        // Generate a unique device identifier based on request characteristics
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = extractClientIpAddress(request);
+        String deviceId = "LAPTOP_" + (userAgent + ipAddress).hashCode();
+        return String.valueOf(Math.abs(deviceId.hashCode()));
+    }
+
+    private String extractClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty()) {
+            return xRealIp;
+        }
+        
+        return request.getRemoteAddr();
     }
 }

@@ -14,6 +14,8 @@ public interface AuthService {
 
     // Token operations
     LoginResponse refreshToken(RefreshTokenRequest request);
+    void revokeAllUserTokens(Long userId);
+    String getDeviceInfo(String refreshToken);
 
     // Password management
     void changePassword(Long userId, ChangePasswordRequest request);
