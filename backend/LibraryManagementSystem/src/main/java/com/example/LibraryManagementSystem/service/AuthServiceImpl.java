@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService{
     private final RefreshTokenService refreshTokenService;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public LoginResponse loginStudent(LoginRequest request) {
         log.info("Student login attempt for email: {}", request.getEmail());
 
@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public LoginResponse loginTeacher(LoginRequest request) {
         log.info("Teacher login attempt for email: {}", request.getEmail());
 
@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public LoginResponse loginAdmin(LoginRequest request) {
         log.info("Admin login attempt for email: {}", request.getEmail());
 
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public LoginResponse refreshToken(RefreshTokenRequest request) {
         log.info("Token refresh attempt");
 
