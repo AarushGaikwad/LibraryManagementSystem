@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Validate token
             if (jwtUtil.validateToken(token, email)) {
                 // Create authentication object
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.toUpperCase());
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 email, // Principal (email)
