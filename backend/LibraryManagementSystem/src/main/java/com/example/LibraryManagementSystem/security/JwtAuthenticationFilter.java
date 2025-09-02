@@ -31,10 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         try {
             String token = extractTokenFromRequest(request);
-
             if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 validateAndSetAuthentication(token, request);
             }
@@ -61,24 +59,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void validateAndSetAuthentication(String token, HttpServletRequest request) {
         try {
-            // Extract user information from token
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractRole(token);
             Long userId = jwtUtil.extractUserId(token);
             String username = jwtUtil.extractUsername(token);
 
-            // Validate token
             if (jwtUtil.validateToken(token, email)) {
-                // Create authentication object
+                // DO NOT prefix role with "ROLE_", use as-is
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.toUpperCase());
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                email, // Principal (email)
-                                null,  // Credentials (no password needed for JWT)
+                                email,
+                                null,
                                 Collections.singletonList(authority)
                         );
 
-                // Set additional details
                 Map<String, Object> details = new HashMap<>();
                 details.put("userId", userId);
                 details.put("username", username);
@@ -89,14 +85,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 authentication.setDetails(details);
 
-                // Set authentication in security context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 log.debug("Authentication set for user: {} with role: {}", email, role);
+
             }
         } catch (JwtException e) {
             log.error("Token validation failed: {}", e.getMessage());
-            throw e; // Re-throw to be handled by outer catch block
+            throw e;
         }
     }
 
@@ -105,13 +101,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                            String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("error", errorCode);
         errorResponse.put("message", message);
         errorResponse.put("timestamp", System.currentTimeMillis());
         errorResponse.put("path", "Authentication Filter");
-
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 
@@ -120,12 +114,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Skip JWT validation for authentication endpoints and public endpoints
         return path.startsWith("/api/auth/") ||
                 path.startsWith("/h2-console/") ||
-                path.startsWith("/actuator/") ||
-                (path.equals("/") && "GET".equals(method)) ||
+                path.startsWith("/actuator/health") ||
                 path.startsWith("/public/") ||
+                path.equals("/") ||
                 path.endsWith(".css") ||
                 path.endsWith(".js") ||
                 path.endsWith(".png") ||
