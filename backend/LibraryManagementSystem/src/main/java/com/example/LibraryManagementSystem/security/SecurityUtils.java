@@ -53,8 +53,9 @@ public class SecurityUtils {
     public static boolean hasRole(String role) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
+            String expectedRole = "ROLE_" + role.toUpperCase();
             return authentication.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_" + role.toUpperCase()));
+                    .anyMatch(authority -> authority.getAuthority().equals(expectedRole));
         }
         return false;
     }

@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-                .authorities(getAuthorities(user.getRole()))
+                .authorities(getAuthorities(user.getRole())) // now uses ROLE_ prefix
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)

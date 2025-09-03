@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateToken(token, email)) {
                 // DO NOT prefix role with "ROLE_", use as-is
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.toUpperCase());
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
