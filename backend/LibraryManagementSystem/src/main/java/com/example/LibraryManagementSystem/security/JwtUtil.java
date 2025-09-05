@@ -37,6 +37,11 @@ public class JwtUtil {
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("email", email);
+
+        //will ensure ROLE_ prefix will be added in the JWT payload response
+        if (!role.startsWith("ROLE_")) {
+            role = "ROLE_" + role;
+        }
         claims.put("role", role);
         claims.put("tokenType", "ACCESS");
 
@@ -49,6 +54,11 @@ public class JwtUtil {
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("email", email);
+
+        //will ensure ROLE_ prefix will be added in the JWT payload response
+        if (!role.startsWith("ROLE_")) {
+            role = "ROLE_" + role;
+        }
         claims.put("role", role);
         claims.put("tokenType", "REFRESH");
 

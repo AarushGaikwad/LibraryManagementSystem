@@ -64,9 +64,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Long userId = jwtUtil.extractUserId(token);
             String username = jwtUtil.extractUsername(token);
 
+
+            log.debug("Extracted from JWT -> email: {}, username: {}, userId: {}, role: {}",
+                    email, username, userId, role);
+
             if (jwtUtil.validateToken(token, email)) {
                 // DO NOT prefix role with "ROLE_", use as-is
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
+                String grantedAuthority = role.toUpperCase();
+                if (!grantedAuthority.startsWith("ROLE_")) {
+                    grantedAuthority = "ROLE_" + grantedAuthority;
+                }
+                log.debug("GrantedAuthority being set = {}", grantedAuthority);
+
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(grantedAuthority);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
