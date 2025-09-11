@@ -2,6 +2,7 @@ package com.example.LibraryManagementSystem.service;
 
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.repository.BookRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class BookServiceImpl implements BookService{
         return bookRepository.findAll();
     }
 
+    @Transactional
     @Override
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
