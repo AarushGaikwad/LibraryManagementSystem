@@ -1,13 +1,15 @@
 package com.example.LibraryManagementSystem.service;
 
+import com.example.LibraryManagementSystem.dto.BookDto;
+import com.example.LibraryManagementSystem.dto.CreateBookDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    LibraryBook saveBook(LibraryBook book);
-    Optional<LibraryBook> findById(Long id);
-    List<LibraryBook> findAll();
+    BookDto saveBook(CreateBookDto dto);
+    Optional<BookDto> findById(Long id);
+    List<BookDto> findAll();
     void deleteBook(Long id);
 }

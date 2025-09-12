@@ -1,5 +1,7 @@
 package com.example.LibraryManagementSystem.controller;
 
+import com.example.LibraryManagementSystem.dto.CreateUserDto;
+import com.example.LibraryManagementSystem.dto.UserDto;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,31 +14,29 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<LibraryUser> createUser(@RequestBody LibraryUser user){
-        LibraryUser savedUser = userService.saveUser(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
+        UserDto user = userService.saveUser(createUserDto);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LibraryUser> getUserById(@PathVariable Long id){
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return userService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<LibraryUser> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         return userService.findAll();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -1,5 +1,6 @@
 package com.example.LibraryManagementSystem.service;
 
+import com.example.LibraryManagementSystem.dto.TransactionDto;
 import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.entity.LibraryTransaction;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
@@ -16,18 +17,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionServiceImpl implements TransactionService{
+public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    private static final int BORROW_DAYS = 14;  //2 week time
+    private static final int BORROW_DAYS = 14;
     private static final double FINE_PER_DAY = 10;
 
     @Override
     @Transactional
-    public LibraryTransaction borrowBook(Long userId, Long bookId) {
+    public TransactionDto borrowBook(Long userId, Long bookId) {
         LibraryUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         LibraryBook book = bookRepository.findById(bookId)
@@ -40,22 +41,20 @@ public class TransactionServiceImpl implements TransactionService{
         book.setAvailable(false);
         bookRepository.save(book);
 
-        LocalDate borrowDate = LocalDate.now();
-        LocalDate dueDate = borrowDate.plusDays(BORROW_DAYS);
-
         LibraryTransaction transaction = LibraryTransaction.builder()
                 .user(user)
                 .book(book)
-                .borrowDate(borrowDate)
-                .dueDate(dueDate)
+                .borrowDate(LocalDate.now())
+                .dueDate(LocalDate.now().plusDays(BORROW_DAYS))
                 .build();
 
-        return transactionRepository.save(transaction);
+        LibraryTransaction savedTx = transactionRepository.save(transaction);
+        return toTransactionDto(savedTx);
     }
 
     @Override
     @Transactional
-    public LibraryTransaction returnBook(Long userId, Long bookId) {
+    public TransactionDto returnBook(Long userId, Long bookId) {
         Optional<LibraryTransaction> optionalTransaction = transactionRepository.findAll().stream()
                 .filter(t -> t.getUser().getId().equals(userId)
                         && t.getBook().getId().equals(bookId)
@@ -70,7 +69,6 @@ public class TransactionServiceImpl implements TransactionService{
         LocalDate returnDate = LocalDate.now();
         transaction.setReturnDate(returnDate);
 
-        // Calculate fine
         if (returnDate.isAfter(transaction.getDueDate())) {
             long daysLate = java.time.temporal.ChronoUnit.DAYS.between(transaction.getDueDate(), returnDate);
             transaction.setFine(daysLate * FINE_PER_DAY);
@@ -82,17 +80,32 @@ public class TransactionServiceImpl implements TransactionService{
         book.setAvailable(true);
         bookRepository.save(book);
 
-        return transactionRepository.save(transaction);
+        LibraryTransaction savedTx = transactionRepository.save(transaction);
+        return toTransactionDto(savedTx);
     }
 
     @Override
-    public Optional<LibraryTransaction> findById(Long id) {
-        return transactionRepository.findById(id);
+    public Optional<TransactionDto> findById(Long id) {
+        return transactionRepository.findById(id)
+                .map(this::toTransactionDto);
     }
 
     @Override
-    public List<LibraryTransaction> findAll() {
-        return transactionRepository.findAll();
+    public List<TransactionDto> findAll() {
+        return transactionRepository.findAll().stream()
+                .map(this::toTransactionDto)
+                .toList();
     }
 
+    private TransactionDto toTransactionDto(LibraryTransaction tx) {
+        TransactionDto dto = new TransactionDto();
+        dto.setId(tx.getId());
+        dto.setUserId(tx.getUser().getId());
+        dto.setBookId(tx.getBook().getId());
+        dto.setBorrowDate(tx.getBorrowDate());
+        dto.setDueDate(tx.getDueDate());
+        dto.setReturnDate(tx.getReturnDate());
+        dto.setFine(tx.getFine());
+        return dto;
+    }
 }
