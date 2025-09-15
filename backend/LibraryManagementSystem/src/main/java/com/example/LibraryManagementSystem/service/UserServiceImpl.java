@@ -5,6 +5,7 @@ import com.example.LibraryManagementSystem.dto.UserDto;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,13 +15,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public UserDto saveUser(CreateUserDto dto) {
+
+        String hashedPassword = passwordEncoder.encode(dto.getPassword());
+
         LibraryUser entity = LibraryUser.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .password(dto.getPassword()) // Should hash before saving!
+                .password(hashedPassword) // Should hash before saving!
                 .role(dto.getRole())
                 .build();
         LibraryUser saved = userRepository.save(entity);
@@ -41,6 +46,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<UserDto> findByEmail(String email) {
+        return userRepository.findByEmail(email).map(this::toUserDto);
+    }
+
+    @Override
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     private UserDto toUserDto(LibraryUser user) {
