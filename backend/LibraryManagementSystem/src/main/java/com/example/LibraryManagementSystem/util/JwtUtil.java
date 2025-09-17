@@ -86,6 +86,7 @@ public class JwtUtil {
     // Create JWT token with claims
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
