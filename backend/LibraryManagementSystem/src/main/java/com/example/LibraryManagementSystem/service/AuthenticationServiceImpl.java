@@ -19,7 +19,7 @@ import java.util.Optional;
 public class AuthenticationServiceImpl implements AuthenticationService{
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public AuthenticationResponseDto login(LoginRequestDto loginRequest) {

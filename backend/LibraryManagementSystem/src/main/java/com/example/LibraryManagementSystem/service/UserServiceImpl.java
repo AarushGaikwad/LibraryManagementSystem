@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public UserDto saveUser(CreateUserDto dto) {
