@@ -18,9 +18,6 @@ public class LibraryBook {
     @Column(nullable=false)
     private String author;
 
-    @Column(columnDefinition = "TEXT")
-    private String qrCode;
-
     @Column(nullable = false)
     private Boolean available = true;
 }

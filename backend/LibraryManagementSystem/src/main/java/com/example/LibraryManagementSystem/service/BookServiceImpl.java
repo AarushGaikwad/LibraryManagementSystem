@@ -17,6 +17,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
+    @Transactional
     public BookDto saveBook(CreateBookDto dto) {
         LibraryBook entity = new LibraryBook();
         entity.setTitle(dto.getTitle());
@@ -39,6 +40,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }
@@ -49,7 +51,6 @@ public class BookServiceImpl implements BookService {
         dto.setTitle(book.getTitle());
         dto.setAuthor(book.getAuthor());
         dto.setAvailable(book.getAvailable());
-        dto.setQrCode(book.getQrCode());
         return dto;
     }
 }
