@@ -4,6 +4,7 @@ import com.example.LibraryManagementSystem.dto.CreateUserDto;
 import com.example.LibraryManagementSystem.dto.UserDto;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
 import com.example.LibraryManagementSystem.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto createUserDto) {
         UserDto user = userService.saveUser(createUserDto);
         return ResponseEntity.ok(user);
     }
