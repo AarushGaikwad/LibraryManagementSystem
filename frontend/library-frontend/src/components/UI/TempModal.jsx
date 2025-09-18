@@ -9,7 +9,6 @@ const Modal = ({
   maxWidth = 'max-w-md',
   closeOnOverlayClick = true 
 }) => {
-    
   // Handle escape key press
   useEffect(() => {
     const handleEscape = (event) => {
