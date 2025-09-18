@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
-import Modal from '../UI/TempModal';
+import Modal from '../UI/Modal';
 import { authAPI } from '../../services/api';
 import { ROLE_CONFIG, utils } from '../../utils/constants';
 
