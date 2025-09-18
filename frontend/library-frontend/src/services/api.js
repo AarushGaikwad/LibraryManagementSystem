@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Get base URL from environment variable or default
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090/api';
+
 // Create axios instance with base configuration
 const API = axios.create({
-  baseURL: 'http://localhost:9090/api', // Your Spring Boot backend URL
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -19,19 +22,31 @@ API.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor to handle errors
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response.data);
+    return response;
+  },
   (error) => {
+    console.error('API Error:', error);
+    
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/';
     }
+    
+    // Handle CORS errors
+    if (error.code === 'ERR_NETWORK') {
+      console.error('Network Error - Check if backend is running on port 9090');
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -40,10 +55,19 @@ API.interceptors.response.use(
 export const authAPI = {
   login: async (credentials) => {
     try {
+      console.log('Sending login request:', credentials);
       const response = await API.post('/auth/login', credentials);
+      console.log('Login response:', response.data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Login failed' };
+      console.error('Login API error:', error);
+      if (error.response?.data) {
+        throw error.response.data;
+      } else if (error.code === 'ERR_NETWORK') {
+        throw { message: 'Cannot connect to server. Please check if the backend is running.' };
+      } else {
+        throw { message: 'Login failed. Please try again.' };
+      }
     }
   },
   
@@ -52,7 +76,10 @@ export const authAPI = {
       const response = await API.get('/auth/test');
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Connection failed' };
+      if (error.code === 'ERR_NETWORK') {
+        throw { message: 'Cannot connect to server. Please check if the backend is running.' };
+      }
+      throw error.response?.data || { message: 'Connection test failed' };
     }
   },
 };
