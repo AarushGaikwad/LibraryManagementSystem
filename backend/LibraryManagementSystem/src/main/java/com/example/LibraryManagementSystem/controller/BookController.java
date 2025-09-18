@@ -6,6 +6,7 @@ import com.example.LibraryManagementSystem.entity.LibraryBook;
 import com.example.LibraryManagementSystem.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Slf4j
+
 public class BookController {
     private final BookService bookService;
 
@@ -39,6 +42,14 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<BookDto>> searchBooks(@RequestParam(required = false) String q) {
+        log.info("Search request received with query: {}", q);
+        List<BookDto> books = bookService.searchBooks(q);
+        log.info("Returning {} books for search query: {}", books.size(), q);
+        return ResponseEntity.ok(books);
     }
 }
 
