@@ -234,12 +234,22 @@ const StudentDashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
-            Welcome back, {user?.name}!
+            {(() => {
+              const hour = new Date().getHours();
+              let greeting = "Hello";
+
+              if (hour < 12) greeting = "Good Morning";
+              else if (hour < 18) greeting = "Good Afternoon";
+              else greeting = "Good Evening";
+
+              return `${greeting}, ${user?.name || "Student"}!`;
+            })()}
           </h2>
           <p className="text-gray-400">
-            Continue your learning journey with our vast collection of resources.
+            Discover new books and continue your learning journey.
           </p>
         </div>
+
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
