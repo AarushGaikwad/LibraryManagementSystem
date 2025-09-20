@@ -90,6 +90,20 @@ export const booksAPI = {
   getById: (id) => API.get(`/books/${id}`),
   create: (bookData) => API.post('/books', bookData),
   delete: (id) => API.delete(`/books/${id}`),
+  search: async (searchTerm) => {
+    try {
+      console.log('Searching for books:', searchTerm);
+      const response = await API.get(`/books/search?q=${encodeURIComponent(searchTerm)}`);
+      console.log('Search results:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Book search error:', error);
+      if (error.code === 'ERR_NETWORK') {
+        throw { message: 'Cannot connect to server. Please check if the backend is running.' };
+      }
+      throw error.response?.data || { message: 'Search failed. Please try again.' };
+    }
+  },
 };
 
 // Users API endpoints

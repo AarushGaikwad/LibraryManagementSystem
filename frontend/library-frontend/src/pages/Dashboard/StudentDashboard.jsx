@@ -10,13 +10,17 @@ import {
   FaHeart,
   FaDownload
 } from 'react-icons/fa';
-import { utils } from '../../utils/constants';
+import { utils } from 'utils/constants';
+import SearchBar from 'components/UI/SearchBar';
+import BookSearch from 'components/BookSearch/BookSearch';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('borrowed');
+  const [showFullSearch, setShowFullSearch] = useState(false);
+  const [quickSearchResults, setQuickSearchResults] = useState([]);
   
   const [stats, setStats] = useState({
     borrowedBooks: 3,
@@ -78,6 +82,40 @@ const StudentDashboard = () => {
     navigate('/');
   };
 
+  // Handle search results from SearchBar
+  const handleSearchResults = (results, query, action) => {
+    setQuickSearchResults(results);
+    
+    if (action === 'select' || results.length > 0) {
+      setShowFullSearch(true);
+    }
+  };
+
+  // Handle search start
+  const handleSearchStart = (query) => {
+    setShowFullSearch(true);
+  };
+
+  // Handle book actions
+  const handleBookAction = (book, action) => {
+    console.log(`${action} action for book:`, book);
+    // Here you can implement actual book borrowing/reserving logic
+    
+    switch (action) {
+      case 'borrow':
+        alert(`Borrowing "${book.title}" by ${book.author}`);
+        break;
+      case 'reserve':
+        alert(`Reserving "${book.title}" by ${book.author}`);
+        break;
+      case 'details':
+        alert(`Showing details for "${book.title}"`);
+        break;
+      default:
+        console.log('Unknown action:', action);
+    }
+  };
+
   const getStatusColor = (daysLeft) => {
     if (daysLeft < 0) return 'text-red-400 bg-red-500/10';
     if (daysLeft <= 3) return 'text-yellow-400 bg-yellow-500/10';
@@ -96,6 +134,62 @@ const StudentDashboard = () => {
     { id: 'recommended', label: 'Recommended', count: recommendedBooks.length },
   ];
 
+  // If full search is active, show the BookSearch component
+  if (showFullSearch) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        {/* Header */}
+        <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setShowFullSearch(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  ← Back to Dashboard
+                </button>
+                <div className="bg-gradient-to-r from-green-500 to-green-600 p-2 rounded-lg">
+                  <FaGraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-white">Search Books</h1>
+                  <p className="text-sm text-gray-400">Find your next great read</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-white">{user?.name}</p>
+                  <p className="text-xs text-gray-400">{user?.email}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="
+                    flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700
+                    text-white rounded-lg transition-colors duration-200
+                  "
+                >
+                  <FaSignOutAlt className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Full Search Component */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <BookSearch 
+            userRole="STUDENT" 
+            onBookSelect={handleBookAction}
+            compact={false}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Header */}
@@ -111,6 +205,18 @@ const StudentDashboard = () => {
                 <h1 className="text-xl font-semibold text-white">Student Portal</h1>
                 <p className="text-sm text-gray-400">Library Management System</p>
               </div>
+            </div>
+
+            {/* Search Bar and User Info */}
+            <div className="flex items-center space-x-4 flex-1 max-w-md mx-8">
+              <SearchBar 
+                userRole="STUDENT"
+                onSearchResults={handleSearchResults}
+                onSearchStart={handleSearchStart}
+                placeholder="Quick search books..."
+                compact={true}
+                showResults={true}
+              />
             </div>
 
             {/* User Info and Logout */}
@@ -197,31 +303,26 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Search Books */}
+        {/* Advanced Search Button */}
         <div className="mb-8">
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4">Discover New Books</h3>
-            <div className="flex space-x-4">
-              <div className="flex-1 relative">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search for books, authors, or subjects..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="
-                    w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg
-                    text-white placeholder-gray-400 focus:outline-none focus:ring-2
-                    focus:ring-green-500 focus:border-transparent
-                  "
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">Discover New Books</h3>
+                <p className="text-gray-400 text-sm">
+                  Use advanced search to find exactly what you're looking for
+                </p>
               </div>
-              <button className="
-                px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 
-                hover:from-green-600 hover:to-green-700 text-white rounded-lg
-                font-medium transition-all duration-200 btn-hover
-              ">
-                Search
+              <button 
+                onClick={() => setShowFullSearch(true)}
+                className="
+                  px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 
+                  hover:from-green-600 hover:to-green-700 text-white rounded-lg
+                  font-medium transition-all duration-200 btn-hover flex items-center space-x-2
+                "
+              >
+                <FaSearch />
+                <span>Advanced Search</span>
               </button>
             </div>
           </div>
@@ -340,18 +441,24 @@ const StudentDashboard = () => {
                       
                       <div className="space-x-2">
                         {book.available ? (
-                          <button className="
-                            px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
-                            hover:from-green-600 hover:to-green-700 text-white rounded-lg
-                            text-sm font-medium transition-all duration-200
-                          ">
+                          <button 
+                            onClick={() => handleBookAction(book, 'borrow')}
+                            className="
+                              px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
+                              hover:from-green-600 hover:to-green-700 text-white rounded-lg
+                              text-sm font-medium transition-all duration-200
+                            "
+                          >
                             Borrow
                           </button>
                         ) : (
-                          <button className="
-                            px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg
-                            text-sm font-medium transition-all duration-200
-                          ">
+                          <button 
+                            onClick={() => handleBookAction(book, 'reserve')}
+                            className="
+                              px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg
+                              text-sm font-medium transition-all duration-200
+                            "
+                          >
                             Reserve
                           </button>
                         )}
@@ -398,11 +505,14 @@ const StudentDashboard = () => {
                         ">
                           Add to Wishlist
                         </button>
-                        <button className="
-                          px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
-                          hover:from-green-600 hover:to-green-700 text-white rounded-lg
-                          text-sm font-medium transition-all duration-200
-                        ">
+                        <button 
+                          onClick={() => handleBookAction(book, 'borrow')}
+                          className="
+                            px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
+                            hover:from-green-600 hover:to-green-700 text-white rounded-lg
+                            text-sm font-medium transition-all duration-200
+                          "
+                        >
                           Borrow
                         </button>
                       </div>

@@ -1,15 +1,46 @@
 // src/components/BookSearch/BookSearch.jsx
-import { useState } from 'react';
-import { FaSearch, FaBook, FaSpinner, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { useState, useCallback } from 'react';
+import { FaSearch, FaBook, FaSpinner, FaCheckCircle, FaTimesCircle, FaTimes } from 'react-icons/fa';
 import { booksAPI } from '../../services/api';
 import { utils } from '../../utils/constants';
 
-const BookSearch = ({ userRole = 'STUDENT' }) => {
+const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Debounced search function for real-time search
+  const debouncedSearch = useCallback(
+    utils.debounce(async (query) => {
+      if (!query.trim()) {
+        setSearchResults([]);
+        setHasSearched(false);
+        return;
+      }
+
+      setLoading(true);
+      setError('');
+      setHasSearched(true);
+
+      try {
+        const results = await booksAPI.search(query.trim());
+        setSearchResults(results);
+        
+        if (results.length === 0) {
+          setError('No books found matching your search criteria');
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        setError(utils.formatErrorMessage(error));
+        setSearchResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500), // 500ms debounce
+    []
+  );
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -37,8 +68,20 @@ const BookSearch = ({ userRole = 'STUDENT' }) => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // Clear error when user starts typing
+    if (error) setError('');
+    
+    // Trigger debounced search for real-time results
+    debouncedSearch(value);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSearch();
     }
   };
@@ -59,14 +102,32 @@ const BookSearch = ({ userRole = 'STUDENT' }) => {
     }
   };
 
+  const handleBookAction = (book, action) => {
+    if (onBookSelect) {
+      onBookSelect(book, action);
+    } else {
+      // Default action logging
+      console.log(`${action} action for book:`, book);
+    }
+  };
+
+  const getSearchTitle = () => {
+    if (compact) return 'Search Books';
+    
+    switch (userRole) {
+      case 'ADMIN': return 'Search Library Catalog';
+      case 'TEACHER': return 'Search Library Catalog';
+      case 'STUDENT': return 'Discover New Books';
+      default: return 'Search Books';
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Search Input */}
       <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {userRole === 'ADMIN' ? 'Search Library Catalog' : 
-           userRole === 'TEACHER' ? 'Search Library Catalog' : 
-           'Discover New Books'}
+        <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-semibold text-white mb-4`}>
+          {getSearchTitle()}
         </h3>
         
         <div className="flex space-x-4">
@@ -76,25 +137,39 @@ const BookSearch = ({ userRole = 'STUDENT' }) => {
               type="text"
               placeholder="Search for books, authors, or subjects..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               className="
-                w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg
+                w-full pl-10 pr-10 py-3 bg-gray-700 border border-gray-600 rounded-lg
                 text-white placeholder-gray-400 focus:outline-none focus:ring-2
-                focus:ring-blue-500 focus:border-transparent
+                focus:ring-blue-500 focus:border-transparent transition-all duration-200
               "
               disabled={loading}
             />
+            {/* Clear button */}
+            {searchQuery && (
+              <button
+                onClick={clearSearch}
+                className="
+                  absolute right-3 top-1/2 transform -translate-y-1/2 
+                  text-gray-400 hover:text-white transition-colors p-1
+                "
+                disabled={loading}
+              >
+                <FaTimes className="w-3 h-3" />
+              </button>
+            )}
           </div>
           
           <button 
             onClick={handleSearch}
-            disabled={loading}
+            disabled={loading || !searchQuery.trim()}
             className={`
               px-6 py-3 bg-gradient-to-r ${getRoleColor(userRole)}
               hover:opacity-90 text-white rounded-lg font-medium 
               transition-all duration-200 btn-hover disabled:opacity-50
               disabled:cursor-not-allowed flex items-center space-x-2
+              ${!searchQuery.trim() ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
             {loading ? (
@@ -109,27 +184,20 @@ const BookSearch = ({ userRole = 'STUDENT' }) => {
               </>
             )}
           </button>
-
-          {hasSearched && (
-            <button
-              onClick={clearSearch}
-              className="
-                px-4 py-3 bg-gray-600 hover:bg-gray-500 text-white 
-                rounded-lg font-medium transition-all duration-200
-              "
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 
       {/* Search Results */}
-      {hasSearched && (
+      {(hasSearched || searchResults.length > 0) && (
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-white">
+            <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-semibold text-white`}>
               Search Results
+              {searchQuery && (
+                <span className="text-sm text-gray-400 font-normal ml-2">
+                  for "{searchQuery}"
+                </span>
+              )}
             </h3>
             {searchResults.length > 0 && (
               <span className="text-sm text-gray-400">
@@ -209,27 +277,36 @@ const BookSearch = ({ userRole = 'STUDENT' }) => {
                     {/* Action Buttons */}
                     <div className="flex space-x-2">
                       {book.available ? (
-                        <button className={`
-                          px-4 py-2 bg-gradient-to-r ${getRoleColor(userRole)}
-                          hover:opacity-90 text-white rounded-lg text-sm 
-                          font-medium transition-all duration-200
-                        `}>
+                        <button 
+                          onClick={() => handleBookAction(book, userRole === 'ADMIN' ? 'manage' : 'borrow')}
+                          className={`
+                            px-4 py-2 bg-gradient-to-r ${getRoleColor(userRole)}
+                            hover:opacity-90 text-white rounded-lg text-sm 
+                            font-medium transition-all duration-200
+                          `}
+                        >
                           {userRole === 'ADMIN' ? 'Manage' : 'Borrow'}
                         </button>
                       ) : (
-                        <button className="
-                          px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white 
-                          rounded-lg text-sm font-medium transition-all duration-200
-                        ">
+                        <button 
+                          onClick={() => handleBookAction(book, 'reserve')}
+                          className="
+                            px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white 
+                            rounded-lg text-sm font-medium transition-all duration-200
+                          "
+                        >
                           Reserve
                         </button>
                       )}
                       
-                      <button className="
-                        px-4 py-2 border border-gray-600 hover:border-gray-500 
-                        text-gray-300 hover:text-white rounded-lg text-sm 
-                        font-medium transition-all duration-200
-                      ">
+                      <button 
+                        onClick={() => handleBookAction(book, 'details')}
+                        className="
+                          px-4 py-2 border border-gray-600 hover:border-gray-500 
+                          text-gray-300 hover:text-white rounded-lg text-sm 
+                          font-medium transition-all duration-200
+                        "
+                      >
                         Details
                       </button>
                     </div>
