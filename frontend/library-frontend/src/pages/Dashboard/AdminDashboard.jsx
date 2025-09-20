@@ -444,31 +444,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* System Status Bar */}
-        <div className="mt-8 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-white text-sm font-medium">System Status: Online</span>
-              </div>
-              <div className="text-gray-400 text-sm">
-                Last backup: 2 hours ago
-              </div>
-              <div className="text-gray-400 text-sm">
-                Active users: 47
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-blue-400 hover:text-blue-300 text-sm">
-                System Logs
-              </button>
-              <button className="text-green-400 hover:text-green-300 text-sm">
-                Backup Now
-              </button>
-            </div>
-          </div>
-        </div>
+        
       </main>
     </div>
   );
