@@ -204,17 +204,6 @@ const TeacherDashboard = () => {
               </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="flex items-center space-x-4 flex-1 max-w-md mx-8">
-              <SearchBar 
-                userRole="TEACHER"
-                onSearchResults={handleSearchResults}
-                onSearchStart={handleSearchStart}
-                placeholder="Quick search books..."
-                compact={true}
-                showResults={true}
-              />
-            </div>
 
             {/* User Info and Logout */}
             <div className="flex items-center space-x-4">
