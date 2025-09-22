@@ -200,7 +200,7 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-white">Teacher Portal</h1>
-                <p className="text-sm text-gray-400">Library Management System</p>
+                {/* <p className="text-sm text-gray-400">Library Management System</p> */}
               </div>
             </div>
 
@@ -208,8 +208,8 @@ const TeacherDashboard = () => {
             {/* User Info and Logout */}
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-gray-400">{user?.email}</p>
+                <p className="text-base font-medium text-white">{user?.name}</p>
+                {/* <p className="text-xs text-gray-400">{user?.email}</p> */}
               </div>
               <button
                 onClick={handleLogout}
