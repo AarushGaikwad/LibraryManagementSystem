@@ -17,11 +17,13 @@ import {
 import { utils } from 'utils/constants';
 import SearchBar from 'components/UI/SearchBar';
 import BookSearch from 'components/BookSearch/BookSearch';
+import CreateUserForm from 'components/CreateUserForm/CreateUserForm';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [showFullSearch, setShowFullSearch] = useState(false);
+  const [showCreateUserForm, setShowCreateUserForm] = useState(false);
   const [quickSearchResults, setQuickSearchResults] = useState([]);
   const [activeView, setActiveView] = useState('dashboard'); // dashboard, search, manage-books, manage-users
   const [stats, setStats] = useState({
@@ -158,7 +160,7 @@ const AdminDashboard = () => {
 
   const quickActions = [
     { title: 'Add New Book', icon: FaBook, color: 'from-blue-500 to-blue-600', action: () => alert('Add New Book') },
-    { title: 'Add New User', icon: FaUsers, color: 'from-green-500 to-green-600', action: () => alert('Add New User') },
+    { title: 'Add New User', icon: FaUsers, color: 'from-green-500 to-green-600', action: () => setShowCreateUserForm(true) },
     { title: 'View Reports', icon: FaChartBar, color: 'from-purple-500 to-purple-600', action: () => alert('View Reports') },
     { title: 'System Settings', icon: FaCog, color: 'from-gray-500 to-gray-600', action: () => alert('System Settings') },
   ];
@@ -169,7 +171,7 @@ const AdminDashboard = () => {
       case 'book': return <FaBook className="w-4 h-4 text-green-400" />;
       case 'transaction': return <FaExchangeAlt className="w-4 h-4 text-purple-400" />;
       case 'system': return <FaCog className="w-4 h-4 text-gray-400" />;
-      default: return <FaCog className="w-4 h-4 text-gray-400" />;
+      default: return <FaCog className="w-4 h-4 text-gray-400" />;  
     }
   };
 
@@ -456,6 +458,21 @@ const AdminDashboard = () => {
 
         
       </main>
+
+      {showCreateUserForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative">
+              <button 
+                onClick={() => setShowCreateUserForm(false)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-white"
+              >
+                ✖
+              </button>
+              <CreateUserForm />
+            </div>
+          </div>
+      )}
+
     </div>
   );
 };

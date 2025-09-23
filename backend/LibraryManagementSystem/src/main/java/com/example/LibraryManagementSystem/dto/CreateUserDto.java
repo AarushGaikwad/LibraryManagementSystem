@@ -9,7 +9,7 @@ import lombok.Data;
 public class CreateUserDto {
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
-    private String name;
+    private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Please provide a valid email address")

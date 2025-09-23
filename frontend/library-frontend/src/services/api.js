@@ -108,11 +108,55 @@ export const booksAPI = {
 
 // Users API endpoints
 export const usersAPI = {
-  getAll: () => API.get('/users'),
-  getById: (id) => API.get(`/users/${id}`),
-  create: (userData) => API.post('/users', userData),
-  delete: (id) => API.delete(`/users/${id}`),
+  // Get all users (Admin only)
+  getAll: async () => {
+    try {
+      const response = await API.get("/users");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error.response?.data || { message: "Failed to fetch users" };
+    }
+  },
+
+  // Get user by ID
+  getById: async (id) => {
+    try {
+      const response = await API.get(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error.response?.data || { message: "Failed to fetch user" };
+    }
+  },
+
+  // Create new user (Admin only)
+  create: async (userData) => {
+    try {
+      console.log("Creating user:", userData);
+      const response = await API.post("/users", userData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      if (error.code === "ERR_NETWORK") {
+        throw { message: "Cannot connect to server. Please check if backend is running." };
+      }
+      throw error.response?.data || { message: "Failed to create user" };
+    }
+  },
+
+  // Delete user by ID (Admin only)
+  delete: async (id) => {
+    try {
+      const response = await API.delete(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error.response?.data || { message: "Failed to delete user" };
+    }
+  },
 };
+
 
 // Transactions API endpoints
 export const transactionsAPI = {

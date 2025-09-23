@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
 
         LibraryUser entity = LibraryUser.builder()
-                .name(dto.getName())
+                .name(dto.getUsername())
                 .email(dto.getEmail())
                 .password(hashedPassword) // Should hash before saving!
                 .role(dto.getRole())
