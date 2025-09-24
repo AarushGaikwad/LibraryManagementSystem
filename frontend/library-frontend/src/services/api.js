@@ -109,7 +109,7 @@ export const booksAPI = {
 // Users API endpoints
 export const usersAPI = {
   // Get all users (Admin only)
-  getAll: async () => {
+  getAllUsers: async () => {
     try {
       const response = await API.get("/users");
       return response.data;

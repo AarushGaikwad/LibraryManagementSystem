@@ -10,10 +10,10 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
 
-  // 🔑 NEW: ref to keep the input focused
+  // ref to keep the input focused
   const inputRef = useRef(null);
 
-  // 🔑 NEW: whenever searchResults change, re-focus the input if it lost focus
+  // whenever searchResults change, re-focus the input if it lost focus
   useEffect(() => {
     if (document.activeElement !== inputRef.current && inputRef.current) {
       inputRef.current.focus();
