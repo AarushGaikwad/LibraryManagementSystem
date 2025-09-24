@@ -1,5 +1,4 @@
-// src/components/BookSearch/BookSearch.jsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { FaSearch, FaBook, FaSpinner, FaCheckCircle, FaTimesCircle, FaTimes } from 'react-icons/fa';
 import { booksAPI } from '../../services/api';
 import { utils } from '../../utils/constants';
@@ -10,6 +9,16 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+
+  // 🔑 NEW: ref to keep the input focused
+  const inputRef = useRef(null);
+
+  // 🔑 NEW: whenever searchResults change, re-focus the input if it lost focus
+  useEffect(() => {
+    if (document.activeElement !== inputRef.current && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [searchResults]);
 
   // Debounced search function for real-time search
   const debouncedSearch = useCallback(
@@ -27,7 +36,7 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
       try {
         const results = await booksAPI.search(query.trim());
         setSearchResults(results);
-        
+
         if (results.length === 0) {
           setError('No books found matching your search criteria');
         }
@@ -38,7 +47,7 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
       } finally {
         setLoading(false);
       }
-    }, 500), // 500ms debounce
+    }, 500),
     []
   );
 
@@ -55,7 +64,7 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
     try {
       const results = await booksAPI.search(searchQuery.trim());
       setSearchResults(results);
-      
+
       if (results.length === 0) {
         setError('No books found matching your search criteria');
       }
@@ -71,11 +80,8 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
-    // Clear error when user starts typing
+
     if (error) setError('');
-    
-    // Trigger debounced search for real-time results
     debouncedSearch(value);
   };
 
@@ -91,6 +97,8 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
     setSearchResults([]);
     setError('');
     setHasSearched(false);
+    // keep focus after clearing
+    inputRef.current?.focus();
   };
 
   const getRoleColor = (role) => {
@@ -106,14 +114,13 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
     if (onBookSelect) {
       onBookSelect(book, action);
     } else {
-      // Default action logging
       console.log(`${action} action for book:`, book);
     }
   };
 
   const getSearchTitle = () => {
     if (compact) return 'Search Books';
-    
+
     switch (userRole) {
       case 'ADMIN': return 'Search Library Catalog';
       case 'TEACHER': return 'Search Library Catalog';
@@ -129,11 +136,12 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
         <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-semibold text-white mb-4`}>
           {getSearchTitle()}
         </h3>
-        
+
         <div className="flex space-x-4">
           <div className="flex-1 relative">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
+              ref={inputRef}                
               type="text"
               placeholder="Search for books, authors, or subjects..."
               value={searchQuery}
@@ -146,7 +154,6 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
               "
               disabled={loading}
             />
-            {/* Clear button */}
             {searchQuery && (
               <button
                 onClick={clearSearch}
@@ -160,7 +167,7 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
               </button>
             )}
           </div>
-          
+
           <button 
             onClick={handleSearch}
             disabled={loading || !searchQuery.trim()}
@@ -206,14 +213,12 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
             )}
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="p-4 bg-red-900/50 border border-red-700 rounded-lg mb-4">
               <p className="text-red-300 text-sm">{error}</p>
             </div>
           )}
 
-          {/* Loading State */}
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
@@ -223,7 +228,6 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
             </div>
           )}
 
-          {/* Search Results List */}
           {!loading && searchResults.length > 0 && (
             <div className="space-y-4">
               {searchResults.map((book) => (
@@ -236,48 +240,31 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      {/* Book Icon */}
-                      <div className={`
-                        w-12 h-16 bg-gradient-to-br ${getRoleColor(userRole)} 
-                        rounded flex items-center justify-center
-                      `}>
+                      <div className={`w-12 h-16 bg-gradient-to-br ${getRoleColor(userRole)} rounded flex items-center justify-center`}>
                         <FaBook className="w-6 h-6 text-white" />
                       </div>
-                      
-                      {/* Book Details */}
                       <div>
-                        <h4 className="text-lg font-medium text-white mb-1">
-                          {book.title}
-                        </h4>
-                        <p className="text-gray-400 text-sm mb-2">
-                          by {book.author}
-                        </p>
-                        
-                        {/* Availability Status */}
+                        <h4 className="text-lg font-medium text-white mb-1">{book.title}</h4>
+                        <p className="text-gray-400 text-sm mb-2">by {book.author}</p>
                         <div className="flex items-center space-x-2">
                           {book.available ? (
                             <>
                               <FaCheckCircle className="text-green-400 text-sm" />
-                              <span className="text-green-400 text-sm font-medium">
-                                Available
-                              </span>
+                              <span className="text-green-400 text-sm font-medium">Available</span>
                             </>
                           ) : (
                             <>
                               <FaTimesCircle className="text-red-400 text-sm" />
-                              <span className="text-red-400 text-sm font-medium">
-                                Not Available
-                              </span>
+                              <span className="text-red-400 text-sm font-medium">Not Available</span>
                             </>
                           )}
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Action Buttons */}
+
                     <div className="flex space-x-2">
                       {book.available ? (
-                        <button 
+                        <button
                           onClick={() => handleBookAction(book, userRole === 'ADMIN' ? 'manage' : 'borrow')}
                           className={`
                             px-4 py-2 bg-gradient-to-r ${getRoleColor(userRole)}
@@ -288,7 +275,7 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
                           {userRole === 'ADMIN' ? 'Manage' : 'Borrow'}
                         </button>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => handleBookAction(book, 'reserve')}
                           className="
                             px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white 
@@ -298,8 +285,8 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
                           Reserve
                         </button>
                       )}
-                      
-                      <button 
+
+                      <button
                         onClick={() => handleBookAction(book, 'details')}
                         className="
                           px-4 py-2 border border-gray-600 hover:border-gray-500 
@@ -316,16 +303,11 @@ const BookSearch = ({ userRole = 'STUDENT', onBookSelect = null, compact = false
             </div>
           )}
 
-          {/* No Results */}
           {!loading && hasSearched && searchResults.length === 0 && !error && (
             <div className="text-center py-8">
               <FaBook className="text-4xl text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400">
-                No books found for "{searchQuery}"
-              </p>
-              <p className="text-gray-500 text-sm mt-2">
-                Try searching with different keywords
-              </p>
+              <p className="text-gray-400">No books found for "{searchQuery}"</p>
+              <p className="text-gray-500 text-sm mt-2">Try searching with different keywords</p>
             </div>
           )}
         </div>

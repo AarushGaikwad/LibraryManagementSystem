@@ -15,7 +15,6 @@ import {
   FaEye
 } from 'react-icons/fa';
 import { utils } from 'utils/constants';
-import SearchBar from 'components/UI/SearchBar';
 import BookSearch from 'components/BookSearch/BookSearch';
 import CreateUserForm from 'components/CreateUserForm/CreateUserForm';
 import CreateBookForm from "components/CreateBookForm/CreateBookForm";
@@ -31,8 +30,8 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalUsers: 156,
     totalBooks: 2847,
-    activeTransactions: 89,
-    overdueBooks: 23,
+    activeTransactions: 10,
+    overdueBooks: 0,
   });
 
   const [recentActivity] = useState([
@@ -142,7 +141,7 @@ const AdminDashboard = () => {
       onClick: () => setActiveView('manage-books')
     },
     {
-      title: 'Active Loans',
+      title: 'Active Transactions',
       value: stats.activeTransactions,
       icon: FaExchangeAlt,
       color: 'from-purple-500 to-purple-600',
@@ -163,8 +162,6 @@ const AdminDashboard = () => {
   const quickActions = [
     { title: 'Add New Book', icon: FaBook, color: 'from-blue-500 to-blue-600', action: () => setShowCreateBookForm(true) },
     { title: 'Add New User', icon: FaUsers, color: 'from-green-500 to-green-600', action: () => setShowCreateUserForm(true) },
-    { title: 'View Reports', icon: FaChartBar, color: 'from-purple-500 to-purple-600', action: () => alert('View Reports') },
-    { title: 'System Settings', icon: FaCog, color: 'from-gray-500 to-gray-600', action: () => alert('System Settings') },
   ];
 
   const getActivityIcon = (type) => {
