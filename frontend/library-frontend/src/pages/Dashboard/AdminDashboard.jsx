@@ -18,12 +18,14 @@ import { utils } from 'utils/constants';
 import SearchBar from 'components/UI/SearchBar';
 import BookSearch from 'components/BookSearch/BookSearch';
 import CreateUserForm from 'components/CreateUserForm/CreateUserForm';
+import CreateBookForm from "components/CreateBookForm/CreateBookForm";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [showFullSearch, setShowFullSearch] = useState(false);
   const [showCreateUserForm, setShowCreateUserForm] = useState(false);
+  const [showCreateBookForm, setShowCreateBookForm] = useState(false);
   const [quickSearchResults, setQuickSearchResults] = useState([]);
   const [activeView, setActiveView] = useState('dashboard'); // dashboard, search, manage-books, manage-users
   const [stats, setStats] = useState({
@@ -159,7 +161,7 @@ const AdminDashboard = () => {
   ];
 
   const quickActions = [
-    { title: 'Add New Book', icon: FaBook, color: 'from-blue-500 to-blue-600', action: () => alert('Add New Book') },
+    { title: 'Add New Book', icon: FaBook, color: 'from-blue-500 to-blue-600', action: () => setShowCreateBookForm(true) },
     { title: 'Add New User', icon: FaUsers, color: 'from-green-500 to-green-600', action: () => setShowCreateUserForm(true) },
     { title: 'View Reports', icon: FaChartBar, color: 'from-purple-500 to-purple-600', action: () => alert('View Reports') },
     { title: 'System Settings', icon: FaCog, color: 'from-gray-500 to-gray-600', action: () => alert('System Settings') },
@@ -472,6 +474,20 @@ const AdminDashboard = () => {
             </div>
           </div>
       )}
+
+      {showCreateBookForm && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative w-96">
+          <button 
+            onClick={() => setShowCreateBookForm(false)}
+            className="absolute top-2 right-2 text-gray-400 hover:text-white"
+          >
+            ✖
+          </button>
+          <CreateBookForm onClose={() => setShowCreateBookForm(false)} />
+        </div>
+      </div>
+)}
 
     </div>
   );
