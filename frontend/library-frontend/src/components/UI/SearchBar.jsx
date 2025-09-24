@@ -1,4 +1,3 @@
-// src/components/UI/SearchBar.jsx
 import { useState, useCallback } from 'react';
 import { FaSearch, FaSpinner, FaTimes } from 'react-icons/fa';
 import { booksAPI } from '../../services/api';

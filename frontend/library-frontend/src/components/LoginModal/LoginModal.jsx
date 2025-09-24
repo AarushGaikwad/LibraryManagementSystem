@@ -1,4 +1,3 @@
-// src/components/LoginModal/LoginModal.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';

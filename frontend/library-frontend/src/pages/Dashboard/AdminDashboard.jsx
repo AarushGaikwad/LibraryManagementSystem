@@ -477,18 +477,9 @@ const AdminDashboard = () => {
       )}
 
       {showDeleteUserForm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative w-[600px]">
-            <button 
-              onClick={() => setShowDeleteUserForm(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
-            >
-              ✖
-            </button>
-            <DeleteUserForm onClose={() => setShowDeleteUserForm(false)} />
-          </div>
-        </div>
-      )}
+      <DeleteUserForm onClose={() => setShowDeleteUserForm(false)} />
+        )}
+
 
 
       {showCreateBookForm && (
