@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import TeacherDashboard from './pages/Dashboard/TeacherDashboard';
 import StudentDashboard from './pages/Dashboard/StudentDashboard';
+import ManageUsers from './pages/ManageUsers/ManageUsers'; // <-- New Manage Users page
 
 // Import utilities
 import { utils } from './utils/constants';
@@ -84,6 +85,16 @@ function App() {
                 <StudentDashboard />
               </ProtectedRoute>
             } 
+          />
+
+          {/* New Protected Route - Manage Users */}
+          <Route
+            path="/manage-users"
+            element={
+              <ProtectedRoute allowedRole="ADMIN">
+                <ManageUsers />
+              </ProtectedRoute>
+            }
           />
           
           {/* Catch all route - redirect to home */}

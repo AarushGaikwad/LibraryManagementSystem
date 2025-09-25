@@ -169,12 +169,28 @@ export const transactionsAPI = {
 
 // Students API endpoints
 export const studentsAPI = {
-  update: (id, studentData) => API.put(`/students/${id}`, studentData),
+  update: async (id, studentData) => {
+    try {
+      const response = await API.put(`/students/${id}`, studentData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating student:", error);
+      throw error.response?.data || { message: "Failed to update student" };
+    }
+  }
 };
 
 // Teachers API endpoints
 export const teachersAPI = {
-  update: (id, teacherData) => API.put(`/teachers/${id}`, teacherData),
+  update: async (id, teacherData) => {
+    try {
+      const response = await API.put(`/teachers/${id}`, teacherData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating teacher:", error);
+      throw error.response?.data || { message: "Failed to update teacher" };
+    }
+  }
 };
 
 export default API;

@@ -23,7 +23,6 @@ const DeleteUserForm = ({ onClose }) => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -66,7 +65,7 @@ const DeleteUserForm = ({ onClose }) => {
     try {
       setDeletingUserId(userToDelete.id);
       await usersAPI.delete(userToDelete.id);
-      
+
       // Remove deleted user from state
       setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
       setShowConfirmModal(false);
@@ -87,7 +86,7 @@ const DeleteUserForm = ({ onClose }) => {
   return (
     <>
       {/* Main Modal */}
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4">
+      <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4 ${showConfirmModal ? 'pointer-events-none' : ''}`}>
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 flex justify-between items-center">
@@ -101,42 +100,39 @@ const DeleteUserForm = ({ onClose }) => {
           </div>
 
           {/* Filter Section */}
-            <div className="px-6 py-4 bg-gray-50 border-b">
-                <div className="flex items-center space-x-4">
-                <label className="text-gray-700 font-medium">Filter by Role:</label>
-
-                <div className="relative">
+          <div className="px-6 py-4 bg-gray-50 border-b">
+            <div className="flex items-center space-x-4">
+              <label className="text-gray-700 font-medium">Filter by Role:</label>
+              <div className="relative">
                 <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="appearance-none px-4 py-2 pr-10 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium 
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  className="appearance-none px-4 py-2 pr-10 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium 
                             focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none cursor-pointer shadow-sm"
                 >
-                    <option value="ALL">All Roles ({users.length})</option>
-                    {availableRoles.map((role) => (
+                  <option value="ALL">All Roles ({users.length})</option>
+                  {availableRoles.map((role) => (
                     <option key={role} value={role}>
-                        {role} ({users.filter(u => u.role === role).length})
+                      {role} ({users.filter(u => u.role === role).length})
                     </option>
-                    ))}
+                  ))}
                 </select>
 
                 {/* Dropdown arrow */}
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                    <svg
+                  <svg
                     className="w-4 h-4 text-gray-500"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     viewBox="0 0 24 24"
-                    >
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
+                  </svg>
                 </div>
-                </div>
-
-                </div>
+              </div>
             </div>
-
+          </div>
 
           {/* Content */}
           <div className="px-6 py-4 max-h-96 overflow-y-auto">
@@ -212,7 +208,7 @@ const DeleteUserForm = ({ onClose }) => {
 
       {/* Confirmation Modal */}
       {showConfirmModal && userToDelete && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-60">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[9999]">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
             <div className="p-6">
               <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
