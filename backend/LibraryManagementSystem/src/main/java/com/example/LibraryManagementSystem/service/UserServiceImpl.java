@@ -2,8 +2,13 @@ package com.example.LibraryManagementSystem.service;
 
 import com.example.LibraryManagementSystem.dto.CreateUserDto;
 import com.example.LibraryManagementSystem.dto.UserDto;
+import com.example.LibraryManagementSystem.entity.LibraryStudent;
+import com.example.LibraryManagementSystem.entity.LibraryTeacher;
 import com.example.LibraryManagementSystem.entity.LibraryUser;
+import com.example.LibraryManagementSystem.repository.StudentRepository;
+import com.example.LibraryManagementSystem.repository.TeacherRepository;
 import com.example.LibraryManagementSystem.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,21 +20,40 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public UserDto saveUser(CreateUserDto dto) {
 
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
 
-        LibraryUser entity = LibraryUser.builder()
+        LibraryUser user = LibraryUser.builder()
                 .name(dto.getUsername())
                 .email(dto.getEmail())
                 .password(hashedPassword) // Should hash before saving!
-                .role(dto.getRole())
+                .role(dto.getRole().toUpperCase())
                 .build();
-        LibraryUser saved = userRepository.save(entity);
-        return toUserDto(saved);
+        LibraryUser savedUser = userRepository.save(user);
+
+        if ("TEACHER".equalsIgnoreCase(dto.getRole())) {
+            LibraryTeacher teacher = LibraryTeacher.builder()
+                    .department(dto.getDepartment())
+                    .designation(dto.getDesignation())
+                    .user(savedUser)
+                    .build();
+            teacherRepository.save(teacher);
+        } else if ("STUDENT".equalsIgnoreCase(dto.getRole())) {
+            LibraryStudent student = LibraryStudent.builder()
+                    .branch(dto.getDepartment())
+                    .yearOfStudy(dto.getYearOfStudy())
+                    .user(savedUser)
+                    .build();
+            studentRepository.save(student);
+        }
+        return toUserDto(savedUser);
     }
 
     @Override

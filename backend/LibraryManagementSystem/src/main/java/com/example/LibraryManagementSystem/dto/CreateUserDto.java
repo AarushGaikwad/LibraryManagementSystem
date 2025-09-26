@@ -22,4 +22,10 @@ public class CreateUserDto {
 
     @NotBlank(message = "Role is required")
     private String role;
+
+    private String designation;
+
+    private String department;
+
+    private Integer yearOfStudy;
 }
