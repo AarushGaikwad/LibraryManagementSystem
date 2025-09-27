@@ -23,8 +23,10 @@ public class CreateUserDto {
     @NotBlank(message = "Role is required")
     private String role;
 
+    @Size(min = 2, max = 50, message = "Designation must be between 2 to 50 characters")
     private String designation;
 
+    @Size(min = 2, max = 50, message = "Designation must be between 2 to 50 characters")
     private String department;
 
     private Integer yearOfStudy;
