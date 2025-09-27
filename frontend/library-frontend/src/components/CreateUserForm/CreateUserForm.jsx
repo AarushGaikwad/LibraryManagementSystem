@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usersAPI } from "../../services/api";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 const CreateUserForm = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const CreateUserForm = ({ onClose }) => {
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [showPassword, setShowPassword] = useState(false); 
 
   const handleChange = (e) => {
     setFormData({
@@ -89,19 +91,26 @@ const CreateUserForm = ({ onClose }) => {
             />
           </div>
 
-          {/* Password */}
-          <div>
+          {/* Password with show/hide */}
+          <div className="relative">
             <label className="block text-sm font-semibold text-gray-300 mb-1">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"} 
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg bg-gray-900 text-white border border-gray-600 focus:border-blue-400 outline-none"
+              className="w-full p-3 pr-12 rounded-lg bg-gray-900 text-white border border-gray-600 focus:border-blue-400 outline-none"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-gray-400 hover:text-white"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           {/* Role */}
