@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import TeacherDashboard from './pages/Dashboard/TeacherDashboard';
 import StudentDashboard from './pages/Dashboard/StudentDashboard';
+import ManageUsersPage from './pages/ManageUsersPage'; 
 
 
 // Import utilities
@@ -87,6 +88,14 @@ function App() {
             } 
           />
 
+          <Route
+            path="/manage-users"
+            element={
+              <ProtectedRoute allowedRole="ADMIN">
+                <ManageUsersPage />
+              </ProtectedRoute>
+            }
+          />
          
           
           {/* Catch all route - redirect to home */}

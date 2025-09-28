@@ -164,7 +164,7 @@ const AdminDashboard = () => {
   const quickActions = [
     { title: 'Add New Book', icon: FaBook, color: 'from-blue-500 to-blue-600', action: () => setShowCreateBookForm(true) },
     { title: 'Add New User', icon: FaUsers, color: 'from-green-500 to-green-600', action: () => setShowCreateUserForm(true) },
-    { title: 'Manage User', icon: FaUsers, color: 'from-purple-500 to-purple-600', action: () => window.open('/manage-users', '_blank') }, // open in new tab
+    { title: 'Manage User', icon: FaUsers, color: 'from-purple-500 to-purple-600', action: () => navigate('/manage-users') }, // open in new tab
     { title: 'Delete Existing User', icon: FaUsers, color: 'from-red-500 to-red-600', action: () => setShowDeleteUserForm(true) },
   ];
 

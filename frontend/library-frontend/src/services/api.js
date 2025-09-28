@@ -155,6 +155,17 @@ export const usersAPI = {
       throw error.response?.data || { message: "Failed to delete user" };
     }
   },
+
+  // Update user by ID (Admin only)
+  update: async (id, userData) => {
+    try {
+      const response = await API.put(`/users/${id}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error.response?.data || {message: "Failed to update user"};
+    }
+  }
 };
 
 
