@@ -82,6 +82,11 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
+    @Override
+    public long getUserCount() {
+        return userRepository.count();
+    }
+
     private UserDto toUserDto(LibraryUser user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());

@@ -13,4 +13,5 @@ public interface UserService {
     void deleteUser(Long id);
     Optional<UserDto> findByEmail(String email);
     boolean validatePassword(String rawPassword, String encodedPassword);
+    long getUserCount();
 }

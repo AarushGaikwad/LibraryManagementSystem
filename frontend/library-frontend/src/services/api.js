@@ -170,6 +170,17 @@ export const usersAPI = {
       console.error("Error updating user:", error);
       throw error.response?.data || {message: "Failed to update user"};
     }
+  },
+
+  // real time count of users
+  getCount: async () => {
+    try {
+      const response = await API.get('/users/count');
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user count:", error);
+      throw error.response?.data || { message: "Failed to fetch user count" };
+    }
   }
 };
 

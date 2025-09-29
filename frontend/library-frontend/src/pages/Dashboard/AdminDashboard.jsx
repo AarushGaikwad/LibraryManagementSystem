@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 import { utils } from 'utils/constants';
 import { booksAPI } from 'services/api';
+import { usersAPI } from 'services/api';
 import BookSearch from 'components/BookSearch/BookSearch';
 import CreateUserForm from 'components/CreateUserForm/CreateUserForm';
 import CreateBookForm from "components/CreateBookForm/CreateBookForm";
@@ -31,7 +32,7 @@ const AdminDashboard = () => {
   const [quickSearchResults, setQuickSearchResults] = useState([]);
   const [activeView, setActiveView] = useState('dashboard'); // dashboard, search, manage-books, manage-users
   const [stats, setStats] = useState({
-    totalUsers: 156,
+    totalUsers: 0,
     totalBooks: 0,
     activeTransactions: 10,
     overdueBooks: 0,
@@ -72,6 +73,7 @@ const AdminDashboard = () => {
     },
   ]);
 
+  //real time book count fetch
   const fetchBookCount = async () => {
   try {
     const data = await booksAPI.getCount();
@@ -80,6 +82,16 @@ const AdminDashboard = () => {
     console.error("Failed to fetch book count:", err);
   }
 };
+
+  // real time user count fetch
+  const fetchUserCount = async () => {
+    try {
+      const count = await usersAPI.getCount();
+      setStats((prev) => ({ ...prev, totalUsers: count }));
+    } catch (err) {
+      console.error("Failed to fetch user count:", err);
+    }
+  };
 
 useEffect(() => {
   const userData = utils.getUserData();
@@ -91,10 +103,13 @@ useEffect(() => {
 
   // fetch initially
   fetchBookCount();
+  fetchUserCount();  
 
-  // // auto refresh every 15s
-  // const interval = setInterval(fetchBookCount, 15000);
-  // return () => clearInterval(interval);
+  // auto refresh every 15s
+  // const interval = setInterval(() => {
+  //   fetchBookCount();
+  //   fetchUserCount();
+  // }, 15000);
 }, [navigate]);
 
   const handleLogout = () => {
@@ -482,14 +497,18 @@ useEffect(() => {
       {showCreateUserForm && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative">
-          <CreateUserForm onClose={() => setShowCreateUserForm(false)} />
+          <CreateUserForm onClose={() => setShowCreateUserForm(false)} 
+            onUserCreated={fetchUserCount}
+          />
         </div>
       </div>
         )}
 
 
       {showDeleteUserForm && (
-      <DeleteUserForm onClose={() => setShowDeleteUserForm(false)} />
+      <DeleteUserForm onClose={() => setShowDeleteUserForm(false)} 
+        onUserDeleted={fetchUserCount}
+      />
         )}
 
 
