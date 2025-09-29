@@ -72,30 +72,30 @@ const AdminDashboard = () => {
     },
   ]);
 
-  useEffect(() => {
-    const userData = utils.getUserData();
-    if (!userData || userData.role !== 'ADMIN') {
-      navigate('/');
-      return;
-    }
-    setUser(userData);
+  const fetchBookCount = async () => {
+  try {
+    const data = await booksAPI.getCount();
+    setStats((prev) => ({ ...prev, totalBooks: data.totalBooks }));
+  } catch (err) {
+    console.error("Failed to fetch book count:", err);
+  }
+};
 
-    const fetchBookCount = async () => {
-      try {
-        const data = await booksAPI.getCount();
-        setStats((prev) => ({ ...prev, totalBooks: data.totalBooks }));
-      } catch (err) {
-        console.error("Failed to fetch book count:", err);
-      }
-    };
+useEffect(() => {
+  const userData = utils.getUserData();
+  if (!userData || userData.role !== 'ADMIN') {
+    navigate('/');
+    return;
+  }
+  setUser(userData);
 
-    fetchBookCount();
+  // fetch initially
+  fetchBookCount();
 
-    // optional refresh every 15s
-    const interval = setInterval(fetchBookCount, 15000);
-    return () => clearInterval(interval);
-
-  }, [navigate]);
+  // // auto refresh every 15s
+  // const interval = setInterval(fetchBookCount, 15000);
+  // return () => clearInterval(interval);
+}, [navigate]);
 
   const handleLogout = () => {
     utils.clearUserData();
@@ -503,7 +503,9 @@ const AdminDashboard = () => {
           >
             ✖
           </button>
-          <CreateBookForm onClose={() => setShowCreateBookForm(false)} />
+          <CreateBookForm onClose={() => setShowCreateBookForm(false)}
+            onBookCreated={fetchBookCount}
+          />
         </div>
       </div>
 )}
