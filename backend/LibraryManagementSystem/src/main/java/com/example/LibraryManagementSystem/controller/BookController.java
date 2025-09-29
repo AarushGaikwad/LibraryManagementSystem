@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -50,6 +51,12 @@ public class BookController {
         List<BookDto> books = bookService.searchBooks(q);
         log.info("Returning {} books for search query: {}", books.size(), q);
         return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> getBooksCount() {
+        long total = bookService.countBooks();
+        return ResponseEntity.ok(Map.of("totalBooks", total));
     }
 }
 

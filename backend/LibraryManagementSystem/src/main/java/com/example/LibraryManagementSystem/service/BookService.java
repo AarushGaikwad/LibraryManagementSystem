@@ -13,4 +13,5 @@ public interface BookService {
     List<BookDto> findAll();
     void deleteBook(Long id);
     List<BookDto> searchBooks(String searchTerm);
+    long countBooks();
 }

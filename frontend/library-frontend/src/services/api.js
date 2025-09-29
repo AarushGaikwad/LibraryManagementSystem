@@ -104,6 +104,11 @@ export const booksAPI = {
       throw error.response?.data || { message: 'Search failed. Please try again.' };
     }
   },
+  // api to return total book count
+  getCount: async () => {
+    const response = await API.get('/books/count');
+    return response.data;
+  }
 };
 
 // Users API endpoints

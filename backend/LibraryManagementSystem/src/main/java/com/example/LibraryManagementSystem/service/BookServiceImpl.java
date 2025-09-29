@@ -71,6 +71,11 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
+    @Override
+    public long countBooks() {
+        return bookRepository.count();
+    }
+
     private BookDto toBookDto(LibraryBook book) {
         BookDto dto = new BookDto();
         dto.setId(book.getId());

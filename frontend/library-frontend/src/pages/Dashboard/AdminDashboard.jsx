@@ -15,6 +15,7 @@ import {
   FaEye
 } from 'react-icons/fa';
 import { utils } from 'utils/constants';
+import { booksAPI } from 'services/api';
 import BookSearch from 'components/BookSearch/BookSearch';
 import CreateUserForm from 'components/CreateUserForm/CreateUserForm';
 import CreateBookForm from "components/CreateBookForm/CreateBookForm";
@@ -31,7 +32,7 @@ const AdminDashboard = () => {
   const [activeView, setActiveView] = useState('dashboard'); // dashboard, search, manage-books, manage-users
   const [stats, setStats] = useState({
     totalUsers: 156,
-    totalBooks: 2847,
+    totalBooks: 0,
     activeTransactions: 10,
     overdueBooks: 0,
   });
@@ -78,6 +79,22 @@ const AdminDashboard = () => {
       return;
     }
     setUser(userData);
+
+    const fetchBookCount = async () => {
+      try {
+        const data = await booksAPI.getCount();
+        setStats((prev) => ({ ...prev, totalBooks: data.totalBooks }));
+      } catch (err) {
+        console.error("Failed to fetch book count:", err);
+      }
+    };
+
+    fetchBookCount();
+
+    // optional refresh every 15s
+    const interval = setInterval(fetchBookCount, 15000);
+    return () => clearInterval(interval);
+
   }, [navigate]);
 
   const handleLogout = () => {
