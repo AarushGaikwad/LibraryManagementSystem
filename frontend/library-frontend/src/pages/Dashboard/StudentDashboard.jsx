@@ -24,7 +24,6 @@ const StudentDashboard = () => {
   
   const [stats, setStats] = useState({
     borrowedBooks: 3,
-    wishlistBooks: 8,
     overdueBooks: 0,
     booksRead: 25,
   });
@@ -56,17 +55,9 @@ const StudentDashboard = () => {
     },
   ]);
 
-  const [wishlistBooks, setWishlistBooks] = useState([
-    { id: 4, title: 'JavaScript: The Good Parts', author: 'Douglas Crockford', available: true },
-    { id: 5, title: 'You Don\'t Know JS', author: 'Kyle Simpson', available: false },
-    { id: 6, title: 'Eloquent JavaScript', author: 'Marijn Haverbeke', available: true },
-  ]);
 
-  const [recommendedBooks] = useState([
-    { id: 7, title: 'React: Up & Running', author: 'Stoyan Stefanov', category: 'Programming' },
-    { id: 8, title: 'Node.js in Action', author: 'Mike Cantelon', category: 'Web Development' },
-    { id: 9, title: 'Python Crash Course', author: 'Eric Matthes', category: 'Programming' },
-  ]);
+
+
 
   useEffect(() => {
     const userData = utils.getUserData();
@@ -129,9 +120,7 @@ const StudentDashboard = () => {
   };
 
   const tabButtons = [
-    { id: 'borrowed', label: 'My Books', count: borrowedBooks.length },
-    { id: 'wishlist', label: 'Wishlist', count: wishlistBooks.length },
-    { id: 'recommended', label: 'Recommended', count: recommendedBooks.length },
+    { id: 'borrowed', label: 'My Books', count: borrowedBooks.length }
   ];
 
   // If full search is active, show the BookSearch component
@@ -265,17 +254,6 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl border border-blue-500/20 bg-blue-500/10 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">Wishlist</p>
-                <p className="text-2xl font-bold text-white mt-1">{stats.wishlistBooks}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600">
-                <FaHeart className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
 
           <div className="p-6 rounded-xl border border-red-500/20 bg-red-500/10 backdrop-blur-sm">
             <div className="flex items-center justify-between">
@@ -405,121 +383,7 @@ const StudentDashboard = () => {
               </div>
             )}
 
-            {/* Wishlist Tab */}
-            {activeTab === 'wishlist' && (
-              <div className="space-y-4">
-                {wishlistBooks.map((book) => (
-                  <div
-                    key={book.id}
-                    className="
-                      p-4 bg-gray-700/50 border border-gray-600 rounded-lg
-                      hover:border-gray-500 transition-colors duration-200
-                    "
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
-                          <FaHeart className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="text-lg font-medium text-white mb-1">{book.title}</h4>
-                          <p className="text-gray-400 text-sm">by {book.author}</p>
-                          <div className="flex items-center mt-2">
-                            <span className={`
-                              inline-block px-2 py-1 rounded-full text-xs font-medium
-                              ${book.available 
-                                ? 'text-green-400 bg-green-500/10' 
-                                : 'text-red-400 bg-red-500/10'
-                              }
-                            `}>
-                              {book.available ? 'Available' : 'Not Available'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-x-2">
-                        {book.available ? (
-                          <button 
-                            onClick={() => handleBookAction(book, 'borrow')}
-                            className="
-                              px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
-                              hover:from-green-600 hover:to-green-700 text-white rounded-lg
-                              text-sm font-medium transition-all duration-200
-                            "
-                          >
-                            Borrow
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => handleBookAction(book, 'reserve')}
-                            className="
-                              px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg
-                              text-sm font-medium transition-all duration-200
-                            "
-                          >
-                            Reserve
-                          </button>
-                        )}
-                        <button className="text-red-400 hover:text-red-300 text-sm">
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
 
-            {/* Recommended Tab */}
-            {activeTab === 'recommended' && (
-              <div className="space-y-4">
-                {recommendedBooks.map((book) => (
-                  <div
-                    key={book.id}
-                    className="
-                      p-4 bg-gray-700/50 border border-gray-600 rounded-lg
-                      hover:border-gray-500 transition-colors duration-200
-                    "
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded flex items-center justify-center">
-                          <FaBook className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="text-lg font-medium text-white mb-1">{book.title}</h4>
-                          <p className="text-gray-400 text-sm">by {book.author}</p>
-                          <span className="inline-block px-2 py-1 rounded-full text-xs font-medium text-purple-400 bg-purple-500/10 mt-2">
-                            {book.category}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-x-2">
-                        <button className="
-                          px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600
-                          hover:from-blue-600 hover:to-blue-700 text-white rounded-lg
-                          text-sm font-medium transition-all duration-200
-                        ">
-                          Add to Wishlist
-                        </button>
-                        <button 
-                          onClick={() => handleBookAction(book, 'borrow')}
-                          className="
-                            px-4 py-2 bg-gradient-to-r from-green-500 to-green-600
-                            hover:from-green-600 hover:to-green-700 text-white rounded-lg
-                            text-sm font-medium transition-all duration-200
-                          "
-                        >
-                          Borrow
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </main>
